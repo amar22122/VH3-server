@@ -1,37 +1,38 @@
 name: Minecraft Server
 
 on:
-  workflow_dispatch:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
+  workflow_dispatch:
 
 jobs:
-  start-server:
+  build:
     runs-on: ubuntu-latest
 
     steps:
-      - name: تثبيت المتطلبات
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install required packages
         run: |
           sudo apt update
-          sudo apt install -y unzip curl python3-pip
-          pip install gdown
+          sudo apt install -y python3-pip unzip
+          pip install --user gdown
 
-      - name: تحميل السيرفر من Google Drive
+      - name: Download server zip from Google Drive
         run: |
-          gdown 1PLIX6xT-05RWA76Y-31sBmiqNTMmlhGQ -O server.zip
+          gdown --fuzzy https://drive.google.com/file/d/1PLIX6xT-05RWA76Y-31sBmiqNTMmlhGQ/view -O VH3.zip
 
-      - name: فك ضغط ملف السيرفر
-        run: unzip server.zip -d server
+      - name: Extract server files
+        run: unzip VH3.zip
 
-      - name: تشغيل Playit.gg
+      - name: Download and setup Playit tunnel
         run: |
-          curl -L -o playit https://playit-cloud.github.io/cli/playit-linux
+          curl -L -o playit https://github.com/playit-cloud/playit-agent/releases/latest/download/playit-linux-amd64
           chmod +x playit
-          ./playit &
 
-      - name: تشغيل السيرفر
-        working-directory: ./server
+      - name: Start Minecraft server with Playit
         run: |
-          chmod +x *.sh || true
-          chmod +x *.jar || true
-          java -Xms2G -Xmx4G -jar forge-*.jar nogui
+          nohup ./playit &
+          sleep 10
+          java -Xmx4G -jar forge-*.jar nogui
