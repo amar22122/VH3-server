@@ -25,10 +25,13 @@ jobs:
 
           echo "📂 فك الضغط..."
           unzip VH3.zip
-          cd VH3 || exit 1
 
-          echo "🔍 البحث عن ملف .jar..."
-          JAR_FILE=$(ls forge-*.jar 2>/dev/null | head -n 1)
+          # تأكد من وجود مجلدات السيرفر
+          echo "📁 المجلدات بعد فك الضغط:"
+          ls -l
+
+          # البحث عن ملف .jar الذي يشغل السيرفر
+          JAR_FILE=$(ls *.jar 2>/dev/null | head -n 1)
           if [ -z "$JAR_FILE" ]; then
             echo "❌ لا يوجد ملف .jar!"
             exit 1
