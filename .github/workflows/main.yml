@@ -1,28 +1,43 @@
-    - name: Setup Minecraft Server
-      run: |
-        echo "📦 تثبيت الأدوات اللازمة..."
-        sudo apt update
-        sudo apt install -y unzip python3-pip curl
-        pip install --user gdown
+name: Minecraft Server
 
-        echo "🔽 تحميل السيرفر من Google Drive..."
-        gdown https://drive.google.com/uc?id=1PLIX6xT-05RWA76Y-31sBmiqNTMmlhGQ
+on:
+  workflow_dispatch:
+  push:
+    branches: [ "main" ]
 
-        echo "📂 فك الضغط..."
-        unzip VH3.zip
-        cd VH3 || exit 1
+jobs:
+  build:
+    runs-on: ubuntu-latest
 
-        echo "🔍 البحث عن ملف .jar..."
-        JAR_FILE=$(ls forge-*.jar 2>/dev/null | head -n 1)
-        if [ -z "$JAR_FILE" ]; then
-          echo "❌ لا يوجد ملف .jar!"
-          exit 1
-        fi
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-        echo "🌐 تحميل playit وتشغيله..."
-        curl -Lo playit https://github.com/playit-cloud/playit-agent/releases/latest/download/playit-linux-amd64
-        chmod +x playit
-        nohup ./playit &
+      - name: Setup Minecraft Server
+        run: |
+          echo "📦 تثبيت الأدوات اللازمة..."
+          sudo apt update
+          sudo apt install -y unzip python3-pip curl
+          pip install --user gdown
 
-        echo "🚀 تشغيل السيرفر..."
-        java -jar "$JAR_FILE" nogui
+          echo "🔽 تحميل السيرفر من Google Drive..."
+          gdown https://drive.google.com/uc?id=1PLIX6xT-05RWA76Y-31sBmiqNTMmlhGQ
+
+          echo "📂 فك الضغط..."
+          unzip VH3.zip
+          cd VH3 || exit 1
+
+          echo "🔍 البحث عن ملف .jar..."
+          JAR_FILE=$(ls forge-*.jar 2>/dev/null | head -n 1)
+          if [ -z "$JAR_FILE" ]; then
+            echo "❌ لا يوجد ملف .jar!"
+            exit 1
+          fi
+
+          echo "🌐 تحميل playit وتشغيله..."
+          curl -Lo playit https://github.com/playit-cloud/playit-agent/releases/latest/download/playit-linux-amd64
+          chmod +x playit
+          nohup ./playit &
+
+          echo "🚀 تشغيل السيرفر..."
+          java -jar "$JAR_FILE" nogui
