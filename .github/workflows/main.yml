@@ -1,8 +1,12 @@
-name: Minecraft Server
+# This is a basic workflow to help you get started with Actions
+
+name: minecraft server
 
 on:
   push:
-    branches: ["main"]
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
   workflow_dispatch:
 
 jobs:
@@ -10,29 +14,35 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Install required packages
+      - name: Install dependencies
         run: |
           sudo apt update
-          sudo apt install -y python3-pip unzip
+          sudo apt install -y unzip python3-pip
           pip install --user gdown
 
-      - name: Download server zip from Google Drive
+      - name: 🔗 تحميل السيرفر من Google Drive
         run: |
-          gdown --fuzzy https://drive.google.com/file/d/1PLIX6xT-05RWA76Y-31sBmiqNTMmlhGQ/view -O VH3.zip
+          gdown https://drive.google.com/uc?id=1PLIX6xT-05RWA76Y-31sBmiqNTMmlhGQ
+          unzip VH3.zip
 
-      - name: Extract server files
-        run: unzip VH3.zip
-
-      - name: Download and setup Playit tunnel
+      - name: 📥 تحميل Playit
         run: |
-          curl -L -o playit https://github.com/playit-cloud/playit-agent/releases/latest/download/playit-linux-amd64
+          curl -Lo playit https://playit-cloud.github.io/cli/playit-linux
           chmod +x playit
 
-      - name: Start Minecraft server with Playit
+      - name: 🚀 تشغيل السيرفر
         run: |
           nohup ./playit &
-          sleep 10
-          java -Xmx4G -jar forge-*.jar nogui
+
+          echo "🔍 البحث عن ملف .jar..."
+          JAR_FILE=$(ls *.jar | head -n 1)
+
+          if [ -z "$JAR_FILE" ]; then
+            echo "❌ لا يوجد ملف .jar!"
+            exit 1
+          fi
+
+          echo "✅ تم العثور على الملف: $JAR_FILE"
+          java -jar "$JAR_FILE"
