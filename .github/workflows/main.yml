@@ -24,3 +24,4 @@ jobs:
           echo "✅ تم فك الضغط، نبدأ تشغيل السيرفر..."
           chmod +x ./start.sh || true
           java -Xmx6G -Xms2G -jar forge*.jar nogui || { echo "تشغيل السيرفر فشل"; exit 1; }
+          
