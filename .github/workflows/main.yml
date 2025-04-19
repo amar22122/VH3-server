@@ -1,0 +1,25 @@
+name: Minecraft Server
+
+on:
+  workflow_dispatch:
+
+jobs:
+  start-server:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: ⬇️ تنزيل ملفات السيرفر من Google Drive
+      run: |
+        sudo apt update
+        sudo apt install -y unzip curl
+
+        echo "🔗 تحميل السيرفر..."
+        curl -L -o server.zip "https://drive.google.com/uc?export=download&id=1zGrOsFwJUhE8jH2sDwD4okJqxDRtr-_H"
+        unzip server.zip -d server
+        cd server
+
+        echo "✅ تم فك الضغط، نبدأ تشغيل السيرفر..."
+
+        chmod +x ./start.sh || true
+        java -Xmx6G -Xms2G -jar forge*.jar nogui
+
