@@ -2,53 +2,40 @@ name: Minecraft Server
 
 on:
   workflow_dispatch:
-  push:
-    branches: [ "main" ]
 
 jobs:
-  build:
+  start-server:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Setup Minecraft Server
+      - name: تثبيت المتطلبات
         run: |
-          echo "📦 تثبيت الأدوات اللازمة..."
           sudo apt update
           sudo apt install -y unzip python3-pip curl
-          pip install --user gdown
+          pip install gdown
 
-          echo "🔽 تحميل السيرفر من Google Drive..."
-          gdown https://drive.google.com/uc?id=1PLIX6xT-05RWA76Y-31sBmiqNTMmlhGQ
+      - name: تحميل السيرفر من Google Drive
+        run: |
+          echo "📥 تحميل VH3.zip من Google Drive..."
+          gdown --id 1JoEfaDE1nQjGNTE_Wl6Yx0MeRBdtoF7M -O VH3.zip
 
-          echo "📂 فك الضغط..."
+      - name: فك الضغط
+        run: |
           unzip VH3.zip
 
-          # فك ضغط باقي الملفات المضغوطة
-          for zip_file in *.zip; do
-            if [[ "$zip_file" != "VH3.zip" ]]; then
-              echo "فك ضغط $zip_file..."
-              unzip "$zip_file"
-            fi
-          done
-
-          # تأكد من وجود مجلدات السيرفر بعد فك الضغط
-          echo "📁 المجلدات بعد فك الضغط:"
-          ls -l
-
-          # البحث عن ملف .jar الذي يشغل السيرفر
-          JAR_FILE=$(ls *.jar 2>/dev/null | head -n 1)
-          if [ -z "$JAR_FILE" ]; then
-            echo "❌ لا يوجد ملف .jar!"
-            exit 1
-          fi
-
-          echo "🌐 تحميل playit وتشغيله..."
+      - name: تشغيل Playit.gg
+        run: |
+          echo "🌐 تحميل playit..."
           curl -Lo playit https://github.com/playit-cloud/playit-agent/releases/latest/download/playit-linux-amd64
           chmod +x playit
           nohup ./playit &
 
-          echo "🚀 تشغيل السيرفر..."
-          java -jar "$JAR_FILE" nogui
+      - name: تشغيل السيرفر
+        run: |
+          echo "🚀 جاري تشغيل السيرفر..."
+          JAR_FILE=$(ls forge-*.jar | head -n 1)
+          if [ -z "$JAR_FILE" ]; then
+            echo "❌ ما وجدنا ملف .jar لتشغيل السيرفر"
+            exit 1
+          fi
+          java -Xmx4G -Xms2G -jar "$JAR_FILE" nogui
