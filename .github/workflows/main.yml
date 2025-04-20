@@ -33,9 +33,14 @@ jobs:
       - name: تشغيل السيرفر
         run: |
           echo "🚀 جاري تشغيل السيرفر..."
-          JAR_FILE=$(ls forge-*.jar | head -n 1)
+
+          # البحث عن ملف forge-*.jar في كل المجلدات
+          JAR_FILE=$(find . -name "forge-*.jar" | head -n 1)
+
           if [ -z "$JAR_FILE" ]; then
-            echo "❌ ما وجدنا ملف .jar لتشغيل السيرفر"
+            echo "❌ ما وجدنا ملف forge-*.jar!"
             exit 1
           fi
+
+          echo "✅ تم العثور على الملف: $JAR_FILE"
           java -Xmx4G -Xms2G -jar "$JAR_FILE" nogui
